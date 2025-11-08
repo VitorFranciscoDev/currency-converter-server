@@ -16,14 +16,14 @@ func NewUserUseCase(r interfaces.UserRepository) *UserUseCase {
 	return &UserUseCase{r: r}
 }
 
-func (u UserUseCase) AddUser(user *entities.User) error {
+func (u UserUseCase) AddUser(user *entities.User) (int64, error) {
 	user.Name = strings.TrimSpace(user.Name)
 	user.Email = strings.TrimSpace(user.Email)
 	user.Password = strings.TrimSpace(user.Password)
 
 	uuid, err := uuid.NewRandom()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	user.UUID = uuid.String()
