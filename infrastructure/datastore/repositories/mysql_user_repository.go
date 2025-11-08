@@ -20,12 +20,15 @@ func (r *MySQLUserRepository) Login(email string, password string) (*entities.Us
 	where email = ? AND password = ?;
 	`
 
-	result, err := r.db.Exec(query, email, password)
+	var user entities.User
+
+	err := r.db.QueryRow(query, email, password).
+		Scan(&user.ID, &user.UUID, &user.Name, &user.Email, &user.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return result, nil
+	return &user, nil
 }
 
 func (r *MySQLUserRepository) GetUserByEmail(email string) (*entities.User, error) {
@@ -34,12 +37,15 @@ func (r *MySQLUserRepository) GetUserByEmail(email string) (*entities.User, erro
 	where email = ?;
 	`
 
-	result, err := r.db.Exec(query, email)
+	var user entities.User
+
+	err := r.db.QueryRow(query, email).
+		Scan(&user.ID, &user.UUID, &user.Name, &user.Email, &user.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	result result, nil
+	return &user, nil
 }
 
 func (r *MySQLUserRepository) AddUser(user *entities.User) (int64, error) {
@@ -52,7 +58,12 @@ func (r *MySQLUserRepository) AddUser(user *entities.User) (int64, error) {
 		return 0, err
 	}
 
-	return result, nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (r *MySQLUserRepository) DeleteUser(uuid string) (int64, error) {
@@ -66,7 +77,12 @@ func (r *MySQLUserRepository) DeleteUser(uuid string) (int64, error) {
 		return 0, err
 	}
 
-	return result, nil
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return rows, nil
 }
 
 func (r *MySQLUserRepository) UpdateUser(user *entities.User) (int64, error) {
@@ -86,5 +102,10 @@ func (r *MySQLUserRepository) UpdateUser(user *entities.User) (int64, error) {
 		return 0, nil
 	}
 
-	return result, nil
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return rows, nil
 }
