@@ -1,0 +1,13 @@
+DROP DATABASE IF EXISTS currencyconverter;
+
+CREATE DATABASE IF NOT EXISTS currencyconverter;
+
+USE currencyconverter;
+
+CREATE TABLE users (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    uuid VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(55) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
